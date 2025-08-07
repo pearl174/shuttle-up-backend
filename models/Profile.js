@@ -1,0 +1,21 @@
+const mongoose = require("mongoose");
+
+const ProfileSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    username: { type: String, required: true, unique: true },
+    matchesPlayed: { type: Number, default: 0 },
+    matchesWon: { type: Number, default: 0 },
+    winRate: { type: Number, default: 0 },
+    ranking: { type: Number, default: null }, 
+    bio: { type: String, default: "" },
+    averageMatchDuration: { type: Number, default: 0 },
+    streak: { type: Number, default: 0 },
+    profilePic: { type: String, default: "" },
+    streak: { type: Number, default: 0 }, // Streak count
+    lastMatchDate: { type: Date, default: null },
+    activityLog: { type: Map, of: Number, default: {} },
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }],
+    friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }] 
+});
+
+module.exports = mongoose.model("Profile", ProfileSchema);
