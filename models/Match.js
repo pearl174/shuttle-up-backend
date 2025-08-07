@@ -21,3 +21,5 @@ MatchSchema.methods.endMatch = async function (players, winnerId) {
   this.winners = winnerId;
   return this.save();
 };
+
+module.exports = mongoose.model("Match", MatchSchema);
