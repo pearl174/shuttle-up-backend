@@ -16,3 +16,17 @@ router.post(
     ],
     signup
 );
+
+// @route   POST /api/auth/login
+// @desc    Login user and get token
+// @access Public
+router.post(
+    "login",
+    [
+        check("email", "Include a valid email").isEmail(),
+        check("password", "Password is required").exists()
+    ],
+    login
+);
+
+module.exports = router;
