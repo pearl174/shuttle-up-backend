@@ -1,13 +1,11 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { validationResult } = require("express-validator");
-const User = require("../models/User.js");
-const Profile = require("../models/Profile.js");
-require("dotenv").config();
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { validationResult } from "express-validator";
+import { prisma } from "../lib/prisma.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-exports.signup = async(req, res) => {
+export const signup = async(req, res) => {
     const errors = validationResult(req); // the req body has errors stored for each one triggered in the authRoute
     // as the checks were in the middleware of .post. get added to the request body and can be gathered here
     if (!errors.isEmpty()) {
@@ -40,7 +38,7 @@ exports.signup = async(req, res) => {
     }
 }
 
-exports.login = async(req, res) => {
+export const login = async(req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });

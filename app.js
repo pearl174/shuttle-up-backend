@@ -1,17 +1,16 @@
-const connectDB = require("./config/db.js");
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
 
-const express = require("express");
 const app = express();
 
-const dotenv = require("dotenv");
-dotenv.config();
-connectDB();
-
-const authRoutes = require("./routes/authRoutes.js");
+await connectDB();
 
 app.use(express.json());
 app.use(cors({
-    origin: "https://localhost:3000",
+    origin: "http://localhost:3000",
     credentials: true
 }));
 

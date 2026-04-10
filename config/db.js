@@ -1,9 +1,13 @@
-const { Pool } = require('pg');
+import { prisma } from "../lib/prisma.js";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
-});
+const connectDB = async () => {
+  try {
+    await prisma.$connect();
+    console.log("Database Connected");
+  } catch (err) {
+    console.error("Database connection failed", err);
+    process.exit(1);
+  }
+};
 
-pool.on('error', (err) => {
-  console.error('Unexpected error on ')
-})
+export default connectDB;
