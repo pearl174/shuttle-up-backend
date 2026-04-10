@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  profile   Profile?
+}
+
+model Profile {
+  id         Int    @id @default(autoincrement())
+  userId     Int    @unique
+  user       User   @relation(fields: [userId], references: [id])
+  profilePic String @default("")
+  streak     Int    @default(0)
+
+  friends  Profile[] @relation("ProfileFriends")
+  friendOf Profile[] @relation("ProfileFriends")
+
+  friendRequests   Profile[] @relation("FriendRequests")
+  friendRequestsBy Profile[] @relation("FriendRequests")
+
+  activityLogs ActivityLog[]
+  matchPlayers MatchPlayer[]
+  matches      Match[]
+}
+
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  profileId Int
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  date      DateTime
+  count     Int
+}
+
+model Match {
+  id        Int           @id @default(autoincrement())
+  date      DateTime      @default(now())
+  startTime DateTime
+  endTime   DateTime
+  winnerId  Int
+  winner    Profile       @relation("MatchWinner", fields: [winnerId], references: [id])
+  players   MatchPlayer[]
+}
+
+model MatchPlayer {
+  id        Int     @id @default(autoincrement())
+  matchId   Int
+  match     Match   @relation(fields: [matchId], references: [id])
+  profileId Int
+  profile   Profile @relation(fields: [profileId], references: [id])
+  score     Int?
+}
