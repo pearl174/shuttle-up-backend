@@ -10,7 +10,7 @@ const router = express.Router();
 router.post(
     "/register",
     [
-        check("username", "Username is required").not().isEmpty(),
+        check("username", "Username is required").not().isEmpty(), // middleware array. best to group them ig
         check("email", "Include a valid email").isEmail(),
         check("password", "Password must be 6 or more chars").isLength({ min: 6 })
     ],

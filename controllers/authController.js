@@ -14,22 +14,28 @@ export const signup = async(req, res) => {
     const { username, email, password } = req.body;
 
     try {
-        const [existingEmail, existingUsername] = await Promise.all([
-            User.findOne({ email }),
-            User.findOne({ username })
-        ]);
-
-        if (existingEmail || existingUsername) {
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                OR: [{ email }, { username }]
+            }
+        })
+        if (existingUser) {
             return res.status(400).json({ msg: "Email or Username already exists" });
         }
 
         // Create new user
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, email, password: hashedPassword });
-        await user.save();
-
-        const profile = new Profile({ user: user._id, username });  
-        await profile.save();
+        const user = await prisma.user.create({
+            data: {
+                username,
+                email,
+                password: hashedPassword,
+                profile: {
+                    create: {} // Foreign key set on its own if using nested stuff like so. 
+                    // The nested way is cleaner and also safer — if the profile create fails, the user won't be created either (it's atomic).
+                }
+            }
+        })
 
         res.status(201).json({ msg: "Signup successful! Please login" });
     } catch (err) {
@@ -46,7 +52,10 @@ export const login = async(req, res) => {
     const { username, password } = req.body;
     
     try {
-        const user = await User.findOne({ username });
+        const user = await prisma.user.findUnique({
+            where: { username }
+        })
+      
         if (!user) {
             return res.status(400).json({ msg: "Invalid credentials" });
         }
@@ -55,8 +64,6 @@ export const login = async(req, res) => {
         if (!isMatch) {
             return res.status(400).json({ msg: "Invalid credentials" });
         }
-        // console.log(user._id); // ObjectId("64f23e9bdbe13a45c5f7c0aa")
-        // console.log(user.id);  // "64f23e9bdbe13a45c5f7c0aa"  (string)
 
         const payload = { user: { id: user.id } };
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
