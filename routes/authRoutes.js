@@ -1,6 +1,6 @@
 import express from "express";
 import { check } from "express-validator";
-import { signup, login } from "../controller/authController.js";
+import { signup, login } from "../controllers/authController.js";
 
 const router = express.Router();
 
@@ -21,9 +21,9 @@ router.post(
 // @desc    Login user and get token
 // @access Public
 router.post(
-    "login",
+    "/login",
     [
-        check("email", "Include a valid email").isEmail(),
+        check("username", "Username is required").not().isEmpty(),
         check("password", "Password is required").exists()
     ],
     login
