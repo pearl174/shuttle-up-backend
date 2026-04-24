@@ -22,11 +22,12 @@ model User {
 }
 
 model Profile {
-  id         Int    @id @default(autoincrement())
-  userId     Int    @unique
-  user       User   @relation(fields: [userId], references: [id])
-  profilePic String @default("")
-  streak     Int    @default(0)
+  id             Int    @id @default(autoincrement())
+  userId         Int    @unique
+  user           User   @relation(fields: [userId], references: [id])
+  profilePicPath String @default("")
+  streak         Int    @default(0)
+  quote          String @default("")
 
   friends  Profile[] @relation("ProfileFriends")
   friendOf Profile[] @relation("ProfileFriends")
@@ -53,14 +54,14 @@ model Match {
   endTime   DateTime
   winnerId  Int      @unique
   winner    Team     @relation("MatchWinner", fields: [winnerId], references: [id])
-  teams     Team[]    @relation("MatchTeams")
+  teams     Team[]   @relation("MatchTeams")
 }
 
 model Team {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   player      Profile[]
   matchId     Int
-  match       Match   @relation("MatchTeams", fields: [matchId], references: [id])
-  matchWinner Match?  @relation("MatchWinner")
-  score Int
+  match       Match     @relation("MatchTeams", fields: [matchId], references: [id])
+  matchWinner Match?    @relation("MatchWinner")
+  score       Int
 }

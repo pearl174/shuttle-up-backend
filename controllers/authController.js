@@ -24,6 +24,11 @@ export const signup = async(req, res) => {
         }
 
         // Create new user
+        // for that get the profile pic path 
+        // total 20 icons 
+        const totalIcons = 20;
+        const randomIconNumber = Math.floor(Math.random() * totalIcons) + 1;
+        const profilePicPath = `/icons/icon${randomIconNumber}.png`;
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await prisma.user.create({
             data: {
@@ -31,7 +36,9 @@ export const signup = async(req, res) => {
                 email,
                 password: hashedPassword,
                 profile: {
-                    create: {} // Foreign key set on its own if using nested stuff like so. 
+                    create: {
+                        profilePicPath: profilePicPath,
+                    } // Foreign key set on its own if using nested stuff like so. 
                     // The nested way is cleaner and also safer — if the profile create fails, the user won't be created either (it's atomic).
                 }
             }
