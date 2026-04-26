@@ -2,14 +2,13 @@ import { prisma } from "../lib/prisma.js";
 
 export const getFriends = async(req, res) => {
     const username = req.params.username;
+    const userId = req.user.id;
     console.log(username);
 
     try {
         const profile = await prisma.profile.findUnique({
             where: { 
-                user: {
-                    username: username
-                }
+                userId: userId
             },
             include: {
                 friends: true
@@ -34,7 +33,7 @@ export const deleteFriend = async(req, res) => {
         const [requesterProfile, friendProfile] = await Promise.all([
             prisma.profile.findUnique({
                 where: {
-                    user: {id: userId}
+                    userId: userId
                 },
                 select: {id: true}
             }),
