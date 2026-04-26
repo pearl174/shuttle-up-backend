@@ -80,3 +80,35 @@ export const getFriendRequests = async(req, res) => {
         res.status(500).json({"msg": "Error retrieving friend requets"})
     }
 }
+
+export const deleteFriendRequest = async(req, res) => {
+    const friendUsername = req.params.friendUsername;
+    const userId = req.user.id;
+    // find profiles for both
+    // disconnect friend req on both using transaction 
+    try {
+        const [friendProfile, requesterProfile] = await Promise.all([
+            prisma.profile.findUnique(
+                where: {user: {username: friendUsername}}
+            ),
+            prisma.profile.findUnique(
+                where: {userId}
+            )
+        ]);
+        if (!friendProfile) throw new Error("Friend profile does not exist");
+        await prisma.$transaction([
+            prisma.profile.update(
+                where: {id: friendProfile.id},
+                data: {friendRequests: {disconnect: requesterProfile.id}}
+            ),
+            prisma.profile.update(
+                where: {id: requesterProfile.id},
+                data: {friendRequests: {disconnect: friendProfile.id}}
+            )
+        ]);
+        res.status(200).json({"msg": "Successfully deleted friend request"});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({"msg": "Error deleting friend request"});
+    }
+}
