@@ -64,3 +64,19 @@ export const deleteFriend = async(req, res) => {
         res.status(500).json({msg: "Something went wrong with deleting your friend"})
     }
 }
+
+export const getFriendRequests = async(req, res) => {
+    const username = req.params.username;
+    const userId = req.user.id;
+
+    try {
+        const profile = await prisma.profile.findUnique({
+            where: {userId},
+            select: {friend}
+        });
+        res.status(200).json({"msg": "Friend requests retrieved successfully.", "friendRequests": profile?.friendRequests});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({"msg": "Error retrieving friend requets"})
+    }
+}

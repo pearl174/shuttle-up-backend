@@ -1,4 +1,4 @@
-import { getFriends, deleteFriend } from "../controllers/friendsController.js";
+import { getFriends, deleteFriend, getFriendRequests } from "../controllers/friendsController.js";
 import authMiddleware from "../middleware/auth.js";
 import express from "express";
 
@@ -22,6 +22,16 @@ router.delete(
     "/:friendUsername",
     authMiddleware,
     deleteFriend
+)
+
+// @route GET /api/friends/requests/:username
+// @desc Get current user's friend requests
+// @access Private
+
+router.get(
+    "/requests/:username",
+    authMiddleware,
+    getFriendRequests
 )
 
 export default router;
