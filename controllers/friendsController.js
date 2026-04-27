@@ -11,7 +11,11 @@ export const getFriends = async(req, res) => {
                 userId: userId
             },
             include: {
-                friends: true
+                friends: {
+                    include: {
+                        user: true
+                    }
+                }
             }
         });
         console.log(profile?.friends);
@@ -72,7 +76,7 @@ export const getFriendRequests = async(req, res) => {
     try {
         const profile = await prisma.profile.findUnique({
             where: {userId},
-            select: {friend}
+            include: {friendRequests: {include: {user: true}}}
         });
         res.status(200).json({"msg": "Friend requests retrieved successfully.", "friendRequests": profile?.friendRequests});
     } catch (err) {
