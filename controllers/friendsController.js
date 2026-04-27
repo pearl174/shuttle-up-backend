@@ -88,22 +88,26 @@ export const deleteFriendRequest = async(req, res) => {
     // disconnect friend req on both using transaction 
     try {
         const [friendProfile, requesterProfile] = await Promise.all([
-            prisma.profile.findUnique(
+            prisma.profile.findUnique({
                 where: {user: {username: friendUsername}}
+            }
             ),
-            prisma.profile.findUnique(
+            prisma.profile.findUnique({
                 where: {userId}
+            }
             )
         ]);
         if (!friendProfile) throw new Error("Friend profile does not exist");
         await prisma.$transaction([
-            prisma.profile.update(
+            prisma.profile.update({
                 where: {id: friendProfile.id},
                 data: {friendRequests: {disconnect: requesterProfile.id}}
+            }
             ),
-            prisma.profile.update(
+            prisma.profile.update({
                 where: {id: requesterProfile.id},
                 data: {friendRequests: {disconnect: friendProfile.id}}
+            }
             )
         ]);
         res.status(200).json({"msg": "Successfully deleted friend request"});
