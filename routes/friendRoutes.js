@@ -43,4 +43,16 @@ router.delete(
     authMiddleware,
     deleteFriendRequest
 )
+
+// @route /api/friends/:friendUsername
+// @desc Add friend for the current user 
+// @access private 
+
+router.post(
+    "/:friendUsername",
+    authMiddleware,
+    deleteFriendRequest,
+    addFriend
+)
+
 export default router;
