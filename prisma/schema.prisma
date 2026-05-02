@@ -29,11 +29,11 @@ model Profile {
   streak         Int    @default(0)
   quote          String @default("")
 
-  friends  Profile[] @relation("ProfileFriends")
-  friendOf Profile[] @relation("ProfileFriends")
+  friends  Profile[] @relation("ProfileFriends") // I have these friends 
+  friendOf Profile[] @relation("ProfileFriends") // I am a friend of
 
-  friendRequests   Profile[] @relation("FriendRequests") // many to many relation
-  friendRequestsBy Profile[] @relation("FriendRequests")
+  friendRequestsSent   Profile[] @relation("FriendRequests") // by me
+  friendRequestsReceived Profile[] @relation("FriendRequests") // I have
 
   activityLogs ActivityLog[]
   player       Team[]
