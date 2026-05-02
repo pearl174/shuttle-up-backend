@@ -55,11 +55,11 @@ export const deleteFriend = async(req, res) => {
         await prisma.$transaction([
             prisma.profile.update({
                 where: {id: requesterProfile.id},
-                data: {friends: {disconnect: friendProfile.id}}
+                data: {friends: {disconnect: {id: friendProfile.id}}}
             }),
             prisma.profile.update({
                 where: {id: friendProfile.id},
-                data: {friends: {disconnect: requesterProfile.id}}
+                data: {friends: {disconnect: {id: requesterProfile.id}}}
             })
         ]);
         res.status(200).json({msg: "Friend deleted"})
@@ -76,7 +76,7 @@ export const getFriendRequests = async(req, res) => {
     try {
         const profile = await prisma.profile.findUnique({
             where: {userId},
-            include: {friendRequests: {include: {user: true}}}
+            include: {friendRequestsReceived: {include: {user: true}}}
         });
         res.status(200).json({"msg": "Friend requests retrieved successfully.", "friendRequests": profile?.friendRequests});
     } catch (err) {
@@ -104,8 +104,8 @@ export const deleteFriendRequest = async(req, res) => {
         if (!friendProfile) throw new Error("Friend profile does not exist");
 
         await prisma.profile.update({
-                where: {id: friendProfile.id},
-                data: {friendRequests: {disconnect: requesterProfile.id}}
+                where: {id: requesterProfile.id},
+                data: {friendRequestsReceived: {disconnect: {id: friendProfile.id}}}
             }
         );
         res.status(200).json({"msg": "Successfully deleted friend request"});
@@ -120,9 +120,35 @@ export const addFriend = async(req, res) => {
     const userId = req.user.id;
 
     try {
-        prisma.profile.update({
-            where: {userId},
-            data: {friendRequests: {}}}
-        )
+        const [requesterProfile, friendProfile] = await Promise.all([
+            prisma.profile.findUnique(
+                {where: userId}
+            ),
+            prisma.profile.findUnique(
+                {where: {user: {username: friendUsername}}}
+            )
+        ]);
+        if (!friendProfile) {
+            throw new Error(`No friend found with username: ${friendUsername}`);
+        }
+
+        await prisma.$transaction([
+            // delete the friend request
+            prisma.profile.update({
+                where: {id: requesterProfile.id},
+                data: {friendRequestsReceived: {disconnect: {id: friendProfile.id}}}
+            }),
+            prisma.profile.update({
+                where: {id: requesterProfile.id},
+                data: {
+                    friends: {connect: {id: friendProfile.id}},
+                    friendOf: {connect: {id: friendProfile.id}}
+                }
+            })
+        ]);
+        res.status(200).json({"msg": "Friend added successfully"});
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({"msg": "Error deleting friend"});
     }
 }

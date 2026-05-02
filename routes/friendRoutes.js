@@ -1,4 +1,4 @@
-import { getFriends, deleteFriend, getFriendRequests, deleteFriendRequest } from "../controllers/friendsController.js";
+import { getFriends, deleteFriend, getFriendRequests, deleteFriendRequest, addFriend } from "../controllers/friendsController.js";
 import authMiddleware from "../middleware/auth.js";
 import express from "express";
 
@@ -51,7 +51,6 @@ router.delete(
 router.post(
     "/:friendUsername",
     authMiddleware,
-    deleteFriendRequest,
     addFriend
 )
 
