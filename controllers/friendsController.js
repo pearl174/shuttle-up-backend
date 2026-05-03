@@ -78,7 +78,7 @@ export const getFriendRequests = async(req, res) => {
             where: {userId},
             include: {friendRequestsReceived: {include: {user: true}}}
         });
-        res.status(200).json({"msg": "Friend requests retrieved successfully.", "friendRequests": profile?.friendRequests});
+        res.status(200).json({"msg": "Friend requests retrieved successfully.", "friendRequests": profile?.friendRequestsReceived});
     } catch (err) {
         console.error(err);
         res.status(500).json({"msg": "Error retrieving friend requets"})
@@ -150,5 +150,20 @@ export const addFriend = async(req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).json({"msg": "Error deleting friend"});
+    }
+}
+
+export const getUsers = async(req, res) => {
+    const userId = req.user.id;
+    try {
+        const users = await prisma.profile.findMany({
+            where: {userId: {not: userId}},
+            include: {user: {select: {username: true}}}
+        });
+        res.status(200).json({"users": users});
+        console.log(users);
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({"msg": "Something went wrong in fetching users"})
     }
 }
