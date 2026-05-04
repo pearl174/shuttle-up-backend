@@ -156,8 +156,13 @@ export const addFriend = async(req, res) => {
 export const getUsers = async(req, res) => {
     const userId = req.user.id;
     try {
+        const profile = await prisma.profile.findUnique({where: {userId}});
         const users = await prisma.profile.findMany({
-            where: {userId: {not: userId}},
+            where: {
+                userId: {not: userId},
+                friendRequestsSent: {none: {id: profile.id}},
+                friendRequestsReceived: {none: {id: profile.id}}
+            },
             include: {user: {select: {username: true}}}
         });
         res.status(200).json({"users": users});
@@ -165,5 +170,34 @@ export const getUsers = async(req, res) => {
     } catch(err) {
         console.error(err);
         res.status(500).json({"msg": "Something went wrong in fetching users"})
+    }
+}
+
+export const addFriendRequest = async(req, res) => {
+    const userId = req.user.id;
+    const friendUsername = req.params.friendUsername;
+
+    try {
+        const [requesterProfile, friendProfile] = await Promise.all([
+            prisma.profile.findUnique({
+                where: {userId}
+            }),
+            prisma.profile.findFirst({
+                where: {user: {username: friendUsername}}
+            })
+        ]);
+        if (!friendProfile) {
+            throw new Error("Friend for friend request not found");
+        }
+        await prisma.profile.update({
+            where: {id: requesterProfile.id},
+            data: {
+                friendRequestsSent: {connect: {id: friendProfile.id}}
+            }
+        })
+        return res.status(200.).json({"msg": "Friend Request sent"});
+    } catch(err) {
+        console.error(err);
+        return res.status(500).json({"msg": "Something went wrong"});
     }
 }

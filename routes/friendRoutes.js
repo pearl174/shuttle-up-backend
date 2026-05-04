@@ -1,4 +1,4 @@
-import { getFriends, deleteFriend, getFriendRequests, deleteFriendRequest, addFriend, getUsers } from "../controllers/friendsController.js";
+import { getFriends, deleteFriend, getFriendRequests, deleteFriendRequest, addFriend, getUsers, addFriendRequest } from "../controllers/friendsController.js";
 import authMiddleware from "../middleware/auth.js";
 import express from "express";
 
@@ -54,10 +54,24 @@ router.post(
     addFriend
 )
 
+// @route /api/friends/
+// @desc Get all existing users
+// @access private 
+
 router.get(
     "/",
     authMiddleware,
     getUsers
+)
+
+// @route /api/friends/requests/:friendUsername
+// @desc Add friend request for the current user 
+// @access private 
+
+router.post(
+    "/requests/:friendUsername",
+    authMiddleware,
+    addFriendRequest
 )
 
 export default router;
