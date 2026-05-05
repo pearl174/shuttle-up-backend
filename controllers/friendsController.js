@@ -166,7 +166,7 @@ export const getUsers = async(req, res) => {
             include: {user: {select: {username: true}}}
         });
         res.status(200).json({"users": users});
-        console.log(users);
+
     } catch(err) {
         console.error(err);
         res.status(500).json({"msg": "Something went wrong in fetching users"})
