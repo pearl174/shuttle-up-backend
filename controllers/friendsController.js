@@ -41,7 +41,7 @@ export const deleteFriend = async(req, res) => {
                 },
                 select: {id: true}
             }),
-            prisma.profile.findUnique({
+            prisma.profile.findFirst({
                 where: {
                     user: {username: friendUsername}
                 },
@@ -49,7 +49,7 @@ export const deleteFriend = async(req, res) => {
             })
         ])
         if (!friendProfile) {
-            return res.status(404).json({msg: "Friend not found"});
+            throw new Error("Friend not found");
         }
         
         await prisma.$transaction([
