@@ -122,9 +122,9 @@ export const addFriend = async(req, res) => {
     try {
         const [requesterProfile, friendProfile] = await Promise.all([
             prisma.profile.findUnique(
-                {where: userId}
+                {where: {userId}}
             ),
-            prisma.profile.findUnique(
+            prisma.profile.findFirst(
                 {where: {user: {username: friendUsername}}}
             )
         ]);
